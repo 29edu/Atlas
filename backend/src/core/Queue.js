@@ -1,8 +1,5 @@
-class InMemoryQueue {
-    constructor() {
-        this.tasks = []; // initialization of task
-        this.taskIdCounter = 0; // Auto-increment id
-    }
+import {InMemoryQueue} from './InMemoryQueue.js'
 
-    
-}
+const queue = new InMemoryQueue();
+
+export {queue}
