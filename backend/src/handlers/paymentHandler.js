@@ -7,7 +7,7 @@ async function paymentHandler(payload) {
         setTimeout(() => {
             console.log("Wait 3 sec to send the payment");
             resolve();
-        })
+        }, 3000)
     })
 
     if(Math.random() < 0.5) {

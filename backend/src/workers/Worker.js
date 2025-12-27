@@ -13,8 +13,7 @@ class Worker {
       while (this.isRunning) {
         const task = await this.queue.getNextTask();
         if (!task) {
-          await this.sleep(5000); //  i am using await here because sleep is returning a promise so  i must wait
-          break;
+          await this.sleep(4000); //  i am using await here because sleep is returning a promise so  i must wait
         } else {
           await this.processTask(task);
         }

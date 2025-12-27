@@ -16,6 +16,7 @@ class InMemoryQueue {
   async getNextTask() {
     const nextTask = this.tasks.find(task => task.status === "pending");
     if(nextTask) {
+      nextTask.markStarted();
       return nextTask;
     }
     else {
