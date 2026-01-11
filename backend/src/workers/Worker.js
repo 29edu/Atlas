@@ -1,3 +1,4 @@
+import { RedisQueue } from "../core/RedisQueue.js";
 class Worker {
   constructor(name, queue, taskHandlers) {
     this.name = name;
@@ -16,8 +17,10 @@ class Worker {
           await this.sleep(4000); //  i am using await here because sleep is returning a promise so  i must wait
         } else {
           await this.processTask(task);
+          
         }
       }
+
     } catch (error) {
       // This is to catch the unexpected Error
       await this.sleep(2000);
@@ -31,9 +34,12 @@ class Worker {
       const response = await this.taskHandlers[task.type](task.payload);
       await task.markCompleted();
       console.log("The task has been completed successfully");
+
     } catch (error) {
+
       console.log("The task has failed");
       await task.markFailed();
+
       if (task.canRetry()) {
         console.log(`Task will retry again after 2 sec`);
         await this.sleep(2000);

@@ -29,7 +29,7 @@ class RedisQueue {
         const taskId = result[1];
         const taskData = await this.redis.hgetall(`task:${taskId}`);
 
-        const convertedTask = await Task.fromRedis(taskData);  // convert to task Object
+        const convertedTask = Task.fromRedis(taskData);  // convert to task Object
         convertedTask.markStarted();
 
         const redisData = convertedTask.toRedis();

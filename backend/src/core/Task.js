@@ -52,7 +52,7 @@ class Task {
   async markCompleted() {
     this.status = "completed";
     this.completedAt = new Date().toISOString();
-    console.log("Completed this task");
+    console.log(`Completed the task ${this.type}`);
   }
 
   canRetry() {
