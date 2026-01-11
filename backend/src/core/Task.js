@@ -1,64 +1,127 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 class Task {
-    constructor({type, payload, userId, priority=5, maxRetry=3,result=false}) {
-        this.uniqueId = uuidv4();
-        this.type = type;
-        this.payload = payload;
-        this.userId = userId;
-        this.status = "pending";
-        this.createdAt = new Date().toISOString();
-        this.startedAt = null;
-        this.completedAt = null;
-        this.failedAt = null;
-        this.result = result;
+  constructor({
+    type,
+    payload,
+    userId,
+    priority = 5,
+    maxRetry = 3,
+    result = false,
+  }) {
+    this.uniqueId = uuidv4();
+    this.type = type;
+    this.payload = payload;
+    this.userId = userId;
+    this.status = "pending";
+    this.createdAt = new Date().toISOString();
+    this.startedAt = null;
+    this.completedAt = null;
+    this.failedAt = null;
+    this.result = result;
 
-        // Retry tracking
-        this.retryCount = 0;
-        this.maxRetry = maxRetry;
-        this.priority = priority;
+    // Retry tracking
+    this.retryCount = 0;
+    this.maxRetry = maxRetry;
+    this.priority = priority;
 
-        // Error tracking
-        this.lastError = null;
-        
+    // Error tracking
+    this.lastError = null;
+  }
+
+  // Create a task
+
+  async markStarted() {
+    this.startedAt = new Date().toISOString();
+    this.status = "processing";
+    console.log(`Started the task ... ${this.type}`);
+  }
+
+  async markFailed(error) {
+    this.retryCount++;
+    this.lastError = error;
+    this.failedAt = new Date().toISOString();
+    if (this.retryCount >= this.maxRetry) {
+      this.status = "failed";
+      console.log("Maximum retry reached .... Task is completely failed");
+    } else {
+      this.status = "pending";
+      console.log("Task is failed. Can be started");
+    }
+  }
+
+  async markCompleted() {
+    this.status = "completed";
+    this.completedAt = new Date().toISOString();
+    console.log("Completed this task");
+  }
+
+  canRetry() {
+    if (this.retryCount >= this.maxRetry) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  async fromRedis(data) {
+    const newTask = new Task({
+      type: data.type,
+      payload: data.payload,
+      userId: data.userId,
+      priority: parseInt(data.priority),
+      maxRetry: parseInt(data.maxRetry),
+    });
+
+    newTask.uniqueId = data.id;
+    newTask.status = data.status;
+    newTask.createdAt = data.createdAt;
+    newTask.startedAt = data.startedAt || null;
+    newTask.completedAt = data.completedAt || null;
+    newTask.failedAt = data.failedAt || null;
+    newTask.retryCount = parseInt(data.retryCount);
+    newTask.lastError = data.lastError || null;
+
+    return newTask;
+  }
+
+  toRedis() {
+    return {
+      id: this.uniqueId,
+      type: this.type,
+      payload: JSON.stringify(this.payload), // converting object to string
+      userId: this.userId,
+      createdAt: this.createdAt,
+      startedAt: this.startedAt,
+      completedAt: this.completedAt,
+      failedAt: this.failedAt,
+      retryCount: this.retryCount.toString(),
+      // newTask.lastError = data.lastError(); wrong , it will crash if the last error is null
+      maxRetry: this.maxRetry.toString(),
+      priority: this.priority.toString(),
+      lastError: this.lastError || "",
     };
+  }
 
-    // Create a task
+  static fromRedis(data) {
+    const task = new Task({
+      type: data.type,
+      payload: JSON.parse(data.payload),
+      userId: data.userId,
+      priority: parseInt(data.priority),
+      maxRetry: parseInt(data.maxRetry),
+    });
 
-    async markStarted() {
-        this.startedAt = new Date().toISOString();
-        this.status = "processing";
-        console.log(`Started the task ... ${this.type}`);
-    }
+    task.uniqueId = data.id;
+    task.status = data.status;
+    task.createdAt = data.createdAt;
+    task.startedAt = data.startedAt || null;
+    task.completedAt = data.completedAt || null;
+    task.failedAt = data.failedAt || null;
+    task.retryCount = parseInt(data.retryCount);
+    task.lastError = data.lastError || null;
 
-    async markFailed(error) {
-        this.retryCount++;
-        this.lastError = error;
-        this.failedAt = new Date().toISOString();
-        if(this.retryCount >= this.maxRetry) {
-            this.status = "failed"
-            console.log('Maximum retry reached ....');
-            return;
-        }else {
-            this.status = "pending";
-            console.log("Can be started");
-        }
-    }
-
-    async markCompleted() {
-        this.status = "completed";
-        this.completedAt = new Date().toISOString();
-        console.log('Completed this task');
-    }
-
-    canRetry() {
-        if(this.retryCount >= this.maxRetry) {
-            return false;
-        } else {
-            return true;
-        }
-    }
+    return task;
+  }
 }
 
-export {
-    Task
-}
+export { Task };

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Background Color Setter</title>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      transition: background-color 0.3s ease;
+    }
+
+    .box {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 140px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h3>Enter HEX Color</h3>
+    <input 
+      type="text" 
+      placeholder="#F5F7FA"
+      oninput="setBg(this.value)"f
+    />
+  </div>
+
+  <script>
+    function setBg(hex) {
+      document.body.style.backgroundColor = hex;
+    }
+  </script>
+
+</body>
+</html>

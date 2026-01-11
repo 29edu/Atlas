@@ -2,77 +2,44 @@ import { queue } from '../src/core/Queue.js';
 import { Worker } from '../src/workers/Worker.js';
 import { taskHandlers } from '../src/handlers/index.js';
 
-console.log('=== Atlas Orchestrator - Complete System Test ===\n');
+console.log('=== Crash Test ===\n');
 
-// Create workers
-const worker1 = new Worker('Worker-1', queue, taskHandlers);
-const worker2 = new Worker('Worker-2', queue, taskHandlers);
+// Create worker
+const worker = new Worker('Worker-1', queue, taskHandlers);
 
-// Start workers
-worker1.start();
-worker2.start();
+// Start worker
+worker.start();
 
-console.log('📋 Submitting tasks...\n');
+// Submit tasks
+console.log('📋 Submitting 10 tasks...\n');
 
-// Submit email tasks
-await queue.submit({
-  type: 'send_email',
-  payload: {
-    to: 'user1@example.com',
-    from: 'noreply@app.com',
-    subject: 'Welcome!',
-    content: 'Thanks for signing up!'
-  },
-  userId: 'user_123'
-});
+for (let i = 1; i <= 10; i++) {
+  await queue.submit({
+    type: 'send_email',
+    payload: {
+      to: `user${i}@example.com`,
+      from: 'noreply@app.com',
+      subject: `Email ${i}`,
+      content: 'Test email'
+    },
+    userId: `user_${i}`
+  });
+}
 
-await queue.submit({
-  type: 'send_email',
-  payload: {
-    to: 'user2@example.com',
-    from: 'noreply@app.com',
-    subject: 'Order Confirmation',
-    content: 'Your order is confirmed!'
-  },
-  userId: 'user_456'
-});
+console.log('✅ 10 tasks submitted!');
+console.log('📊 Initial stats:', queue.getStats());
 
-// Submit payment task
-await queue.submit({
-  type: 'send_payment',
-  payload: {
-    to: 'merchant@example.com',
-    from: 'user@example.com',
-    amount: 99.99
-  },
-  userId: 'user_789'
-});
+// Wait 5 seconds
+await new Promise(resolve => setTimeout(resolve, 5000));
 
-// Submit image task
-await queue.submit({
-  type: 'resize_image',
-  payload: {
-    width: 800,
-    height: 600
-  },
-  userId: 'user_999'
-});
+console.log('\n💥 SIMULATING CRASH IN 2 SECONDS...');
+console.log('📊 Stats before crash:', queue.getStats());
 
-console.log('✅ 4 tasks submitted!\n');
+await new Promise(resolve => setTimeout(resolve, 2000));
 
-// Show stats every 3 seconds
-const statsInterval = setInterval(() => {
-  const stats = queue.getStats();
-  console.log('📊 Queue Stats:', stats);
-}, 3000);
+console.log('\n💥💥💥 CRASH! (Press Ctrl+C now or wait 2 sec)\n');
 
-// Stop after 30 seconds
-setTimeout(async () => {
-  console.log('\n🛑 Stopping workers...');
-  await worker1.stop();
-  await worker2.stop();
-  clearInterval(statsInterval);
-  
-  console.log('\n📊 Final Stats:', queue.getStats());
-  process.exit(0);
-}, 30000);
+await new Promise(resolve => setTimeout(resolve, 2000));
+
+// Force exit (simulates crash)
+process.exit(1);
