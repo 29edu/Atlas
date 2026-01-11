@@ -22,7 +22,7 @@ class RedisWorker {
                 if(task) {
 
                     this.currentTask = task;
-                    await this.procesTask(task);
+                    await this.processTask(task);
                     this.currentTask = null;
                 }
             }
@@ -33,12 +33,11 @@ class RedisWorker {
         
     }
 
-    async procesTask(task) {
+    async processTask(task) {
         console.log(`${this.name} redis worker is processing the task`);
-        task.markStarted(); // I don't need to import Task because RedisQueue is already doing that
         try {
 
-            const response = await this.taskHandler[task.type];
+            const response = this.taskHandler[task.type];
 
             if(!response) {
                 throw new Error(`No handler for task type ${task.type}`)
@@ -65,10 +64,14 @@ class RedisWorker {
 
     sleep = async (ms) => {
         return new Promise((resolve) => {
-            console.log(`Wait for ${ms/2000} sec to start again`)
+            console.log(`Wait for ${ms/1000} sec to start again`)
             setTimeout(() => {
                 resolve();
             }, ms)
         })
     }
+}
+
+export {
+    RedisWorker
 }
