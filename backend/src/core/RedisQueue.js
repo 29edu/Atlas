@@ -11,11 +11,14 @@ class RedisQueue {
     }
 
     async submit(taskData) {
+        
         const task = new Task(taskData); //  creating task object
         const redisData = task.toRedis(); // converting to redis format
+        
         await this.redis.hset(`task:${task.uniqueId}`, redisData); // storing in hash
+        console.log("Stored in hset", taskData);
         await this.redis.lpush(this.queueName, task.uniqueId); // pushing id to queue
-        console.log(`Taskk submitted to Redis : ${task.uniqueId}`);
+        console.log(`Task submitted to Redis : ${task.uniqueId}`);
         return task;
     }
     

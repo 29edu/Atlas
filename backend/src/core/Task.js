@@ -13,7 +13,7 @@ class Task {
     this.payload = payload;
     this.userId = userId;
     this.status = "pending";
-    this.createdAt = new Date().toISOString();
+    this.createdAt = new Date();
     this.startedAt = null;
     this.completedAt = null;
     this.failedAt = null;
@@ -90,17 +90,30 @@ class Task {
       type: this.type,
       payload: JSON.stringify(this.payload), // converting object to string
       userId: this.userId,
-      createdAt: this.createdAt,
-      startedAt: this.startedAt,
-      completedAt: this.completedAt,
-      failedAt: this.failedAt,
+      status: this.status,
+      createdAt: this.createdAt ? this.dateToRedis(this.createdAt) : "",
+      startedAt: this.startedAt ? this.dateToRedis(this.startedAt) : "",
+      completedAt: this.completedAt ? this.dateToRedis(this.completedAt) : "",
+      failedAt: this.failedAt ? this.dateToRedis(this.failedAt) : "",
       retryCount: this.retryCount.toString(),
-      // newTask.lastError = data.lastError(); wrong , it will crash if the last error is null
       maxRetry: this.maxRetry.toString(),
       priority: this.priority.toString(),
       lastError: this.lastError || "",
     };
   }
+
+  dateToRedis = (value) => {
+    console.log(
+      "dateToRedis called with:",
+      JSON.stringify(value),
+      "type:",
+      typeof value
+    );
+    if (!value) return "";
+    if (typeof value === "string") return value; // Already a string
+    if (value instanceof Date) return value.toISOString();
+    return new Date(value).toISOString();
+  };
 
   static fromRedis(data) {
     const task = new Task({
