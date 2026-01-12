@@ -10,19 +10,50 @@ class RedisQueue {
     this.queueName = "tasks:pending";
   }
 
-  async submit(taskData) {
-    console.log("Submit called with:", taskData);
-    const task = new Task(taskData); //  creating task object
-    console.log("Task created:", task.uniqueId);
-    const redisData = task.toRedis(); // converting to redis format
-    console.log("Redis data:", JSON.stringify(redisData));
+//   async submit(taskData) {
+//     console.log("Submit called with:", taskData);
+//     const task = new Task(taskData); //  creating task object
+//     console.log("Task created:", task.uniqueId);
+//     const redisData = task.toRedis(); // converting to redis format
+//     console.log("Redis data:", JSON.stringify(redisData));
 
-    await this.redis.hset(`task:${task.uniqueId}`, redisData); // storing in hash
-    console.log("Stored in hset", taskData);
-    await this.redis.lpush(this.queueName, task.uniqueId); // pushing id to queue
-    console.log(`Task submitted to Redis : ${task.uniqueId}`);
-    return task;
+//     await this.redis.hset(`task:${task.uniqueId}`, redisData); // storing in hash
+//     console.log("Stored in hset", taskData);
+//     await this.redis.lpush(this.queueName, task.uniqueId); // pushing id to queue
+//     console.log(`Task submitted to Redis : ${task.uniqueId}`);
+//     return task;
+//   }
+
+async submit(taskData) {
+  console.log("Submit called with:", taskData);
+  const task = new Task(taskData);
+  console.log("Task created:", task.uniqueId);
+  const redisData = task.toRedis();
+  console.log("Redis data:", JSON.stringify(redisData));
+
+  console.log("🔹 About to call hset...");
+  
+  try {
+    // Add 5 second timeout
+    await Promise.race([
+      this.redis.hset(`task:${task.uniqueId}`, redisData),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('hset timeout after 5s')), 5000)
+      )
+    ]);
+    console.log("🔹 hset completed!");
+  } catch (error) {
+    console.error("❌ hset failed:", error.message);
+    throw error;
   }
+  
+  console.log("🔹 About to call lpush...");
+  await this.redis.lpush(this.queueName, task.uniqueId);
+  console.log("🔹 lpush completed!");
+  
+  console.log(`✅ Task submitted to Redis: ${task.uniqueId}`);
+  return task;
+}
 
   async getNextTask() {
     const result = await this.redis.brpop(this.queueName, 0);

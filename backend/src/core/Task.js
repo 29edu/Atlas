@@ -91,10 +91,14 @@ class Task {
       payload: JSON.stringify(this.payload), // converting object to string
       userId: this.userId,
       status: this.status,
-      createdAt: this.createdAt ? this.dateToRedis(this.createdAt) : "",
-      startedAt: this.startedAt ? this.dateToRedis(this.startedAt) : "",
-      completedAt: this.completedAt ? this.dateToRedis(this.completedAt) : "",
-      failedAt: this.failedAt ? this.dateToRedis(this.failedAt) : "",
+      // createdAt: this.createdAt ? this.dateToRedis(this.createdAt) : "",
+      // startedAt: this.startedAt ? this.dateToRedis(this.startedAt) : "",
+      // completedAt: this.completedAt ? this.dateToRedis(this.completedAt) : "",
+      // failedAt: this.failedAt ? this.dateToRedis(this.failedAt) : "",
+       createdAt: this.createdAt || "",       // ✅ Already a string!
+      startedAt: this.startedAt || "",       // ✅ Already a string!
+      completedAt: this.completedAt || "",   // ✅ Already a string!
+      failedAt: this.failedAt || "", 
       retryCount: this.retryCount.toString(),
       maxRetry: this.maxRetry.toString(),
       priority: this.priority.toString(),
