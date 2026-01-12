@@ -13,7 +13,7 @@ class Task {
     this.payload = payload;
     this.userId = userId;
     this.status = "pending";
-    this.createdAt = new Date();
+    this.createdAt = new Date().toISOString();
     this.startedAt = null;
     this.completedAt = null;
     this.failedAt = null;
@@ -63,7 +63,7 @@ class Task {
     }
   }
 
-  async fromRedis(data) {
+  static fromRedis(data) {
     const newTask = new Task({
       type: data.type,
       payload: data.payload,
@@ -102,7 +102,7 @@ class Task {
     };
   }
 
-  dateToRedis = (value) => {
+  dateToRedis(value) {
     console.log(
       "dateToRedis called with:",
       JSON.stringify(value),

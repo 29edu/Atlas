@@ -13,6 +13,7 @@ const keys = await queue.redis.keys('task:*');
 if (keys.length > 0) {
   await queue.redis.del(...keys);
 }
+
 console.log('✅ Redis cleaned\n');
 
 // Create RedisWorker
