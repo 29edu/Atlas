@@ -95,9 +95,9 @@ class Task {
       // startedAt: this.startedAt ? this.dateToRedis(this.startedAt) : "",
       // completedAt: this.completedAt ? this.dateToRedis(this.completedAt) : "",
       // failedAt: this.failedAt ? this.dateToRedis(this.failedAt) : "",
-       createdAt: this.createdAt || "",       // ✅ Already a string!
-      startedAt: this.startedAt || "",       // ✅ Already a string!
-      completedAt: this.completedAt || "",   // ✅ Already a string!
+       createdAt: this.createdAt || "",    
+      startedAt: this.startedAt || "",     
+      completedAt: this.completedAt || "",  
       failedAt: this.failedAt || "", 
       retryCount: this.retryCount.toString(),
       maxRetry: this.maxRetry.toString(),
