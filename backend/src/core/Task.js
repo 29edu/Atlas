@@ -86,6 +86,7 @@ class Task {
     newTask.failedAt = data.failedAt || null;
     newTask.retryCount = parseInt(data.retryCount);
     newTask.lastError = data.lastError || null;
+    newTask.workerId = data.workerId || "";
 
     return newTask;
   }
@@ -109,6 +110,7 @@ class Task {
       maxRetry: this.maxRetry.toString(),
       priority: this.priority.toString(),
       lastError: this.lastError || "",
+      workerId: this.workerId || null,
     };
   }
 
