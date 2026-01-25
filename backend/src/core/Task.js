@@ -7,6 +7,8 @@ class Task {
     priority = 5,
     maxRetry = 3,
     result = false,
+    workerId = null
+    
   }) {
     this.uniqueId = uuidv4();
     this.type = type;
@@ -26,13 +28,17 @@ class Task {
 
     // Error tracking
     this.lastError = null;
+
+    // Tracking which worker is working on the task
+    this.workerId = workerId || null;
   }
 
   // Create a task
 
-  async markStarted() {
+  async markStarted(workerId) {
     this.startedAt = new Date().toISOString();
     this.status = "processing";
+    this.workerId = workerId;
     console.log(`Started the task ... ${this.type}`);
   }
 

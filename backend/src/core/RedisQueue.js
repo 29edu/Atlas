@@ -8,6 +8,7 @@ class RedisQueue {
       port: 6379,
     });
     this.queueName = "tasks:pending";
+    this.workerId = null;
   }
 
 //   async submit(taskData) {
@@ -55,9 +56,9 @@ async submit(taskData) {
   return task;
 }
 
-  async getNextTask() {
+  async getNextTask(workerId) {
     const result = await this.redis.brpop(this.queueName, 0);
-
+    this.workerId = workerId;
     if (!result) {
       return null;
     }
@@ -66,7 +67,7 @@ async submit(taskData) {
     const taskData = await this.redis.hgetall(`task:${taskId}`);
 
     const convertedTask = Task.fromRedis(taskData); // convert to task Object
-    convertedTask.markStarted();
+    convertedTask.markStarted(this.workerId);
 
     const redisData = convertedTask.toRedis();
     await this.redis.hset(`task:${taskId}`, redisData);

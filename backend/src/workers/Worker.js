@@ -17,7 +17,6 @@ class Worker {
           await this.sleep(4000); //  i am using await here because sleep is returning a promise so  i must wait
         } else {
           await this.processTask(task);
-          
         }
       }
 

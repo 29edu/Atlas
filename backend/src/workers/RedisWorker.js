@@ -1,7 +1,6 @@
-
 // This worker help to manage the tasks
-
 import { RedisQueue } from "../core/RedisQueue.js";
+import { v4 as uuidv4 } from "uuid";
 
 class RedisWorker {
     constructor(name, queue, taskHandler) {
@@ -10,24 +9,45 @@ class RedisWorker {
         this.taskHandler = taskHandler;
         this.isRunning = false;
         this.currentTask = null;
+        this.workerId = uuidv4();
+
+        this.heartBeat = {
+            "WorkerId" : this.workerId,
+            "lastSeen" : new Date().toISOString(),
+            "currentTask" : this.currentTask || '',
+            "status" : "Active"
+        }
+
+        console.log(this.heartBeat);
     }
 
     async start() {
         this.isRunning = true;
         console.log(`Redis worker ${this.name} has started`);
+        console.log('HearBeat: ', this.heartBeat);
+
+        // while(this.isRunning) {  wrong I Cannot do like this because it will run forever and won't prcoceed to the next code so its kind of stuck
+        //     setInterval(() => {
+        //         console.log(this.heartBeat)
+        //     }, 10000);
+        // }
+
+        this.heartBeatFunction();
 
         try {
             while(this.isRunning) {
-                const task = await this.queue.getNextTask();
+                const task = await this.queue.getNextTask(this.workerId);
                 if(task) {
 
                     this.currentTask = task;
+                    this.heartBeat.currentTask = this.currentTask;
+                    
                     await this.processTask(task);
                     this.currentTask = null;
                 }
             }
         } catch (error) {
-            console.log('Something Error in the Worker',  error);
+            console.log('Something Error in the Redis Worker',  error);
             await this.sleep(2000);
         }
         
@@ -57,6 +77,8 @@ class RedisWorker {
     async stop() {
         console.log(`Stopped redis worker ${this.name}...`);
         this.isRunning = false;
+        this.heartBeat.status= 'notActive';
+        this.heartBeat.lastSeen = new Date().toISOString();
         if(this.currentTask) {
             console.log(`Waiting for current task to finish`)
         }
@@ -69,6 +91,25 @@ class RedisWorker {
                 resolve();
             }, ms)
         })
+    }
+
+    heartBeatFunction = async () => {
+
+        setInterval(async () => {
+            this.heartBeat.lastSeen = new Date().toISOString();
+
+            // this is wrong because redis doesn't store object , it only understand key value pair 
+            // so we will have to convert the object into key value pair using 
+            // ...Object.entries(data).flat()
+
+            // await this.queue.redis.hset(  
+            //     `worker:${this.workerId}`, this.heartBeat
+            // )
+
+            await this.queue.redis.hset(`worker:${this.workerId}`, ...Object.entries(this.heartBeat).flat());
+
+            console.log(this.heartBeat);
+        }, 10000)
     }
 }
 
