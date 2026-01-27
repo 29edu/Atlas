@@ -10,9 +10,11 @@ class RedisWorker {
         this.isRunning = false;
         this.currentTask = null;
         this.workerId = uuidv4();
+        this.workerName = this.name;
 
         this.heartBeat = {
             "WorkerId" : this.workerId,
+            "WorkerName" : this.workerName,
             "lastSeen" : new Date().toISOString(),
             "currentTask" : this.currentTask || '',
             "status" : "Active"
@@ -122,7 +124,6 @@ class RedisWorker {
     sendHeartBeat = async () => {
         this.heartBeat.lastSeen = new Date().toISOString();
         await this.queue.redis.hset(`worker:${this.workerId}`, ...Object.entries(this.heartBeat).flat());
-
     }
 }
 
