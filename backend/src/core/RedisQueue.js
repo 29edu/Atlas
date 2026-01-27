@@ -7,6 +7,7 @@ class RedisQueue {
       host: "localhost",
       port: 6379,
     });
+
     this.queueName = "tasks:pending";
     this.workerId = null;
   }
@@ -26,6 +27,7 @@ class RedisQueue {
 //   }
 
 async submit(taskData) {
+
   console.log("Submit called with:", taskData);
   const task = new Task(taskData);
   console.log("Task created:", task.uniqueId);
@@ -42,7 +44,9 @@ async submit(taskData) {
         setTimeout(() => reject(new Error('hset timeout after 5s')), 5000)
       )
     ]);
+
     console.log("🔹 hset completed!");
+    
   } catch (error) {
     console.error("❌ hset failed:", error.message);
     throw error;
@@ -62,7 +66,7 @@ async submit(taskData) {
     if (!result) {
       return null;
     }
-
+    
     const taskId = result[1];
     const taskData = await this.redis.hgetall(`task:${taskId}`);
 

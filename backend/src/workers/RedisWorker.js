@@ -32,7 +32,9 @@ class RedisWorker {
         //     }, 10000);
         // }
 
+        this.sendHeartBeat();
         this.heartBeatFunction();
+        
 
         try {
             while(this.isRunning) {
@@ -41,7 +43,6 @@ class RedisWorker {
 
                     this.currentTask = task;
                     this.heartBeat.currentTask = this.currentTask;
-                    
                     await this.processTask(task);
                     this.currentTask = null;
                 }
@@ -77,9 +78,15 @@ class RedisWorker {
     async stop() {
         console.log(`Stopped redis worker ${this.name}...`);
         this.isRunning = false;
+
+        clearInterval(this.heartBeatFunction)
         this.heartBeat.status= 'notActive';
         this.heartBeat.lastSeen = new Date().toISOString();
+        this.sendHeartBeat();
+
+       
         if(this.currentTask) {
+
             console.log(`Waiting for current task to finish`)
         }
     }
@@ -95,7 +102,7 @@ class RedisWorker {
 
     heartBeatFunction = async () => {
 
-        setInterval(async () => {
+        const heartBeatInterval = setInterval(async () => {
             this.heartBeat.lastSeen = new Date().toISOString();
 
             // this is wrong because redis doesn't store object , it only understand key value pair 
@@ -110,6 +117,12 @@ class RedisWorker {
 
             console.log(this.heartBeat);
         }, 10000)
+    }
+
+    sendHeartBeat = async () => {
+        this.heartBeat.lastSeen = new Date().toISOString();
+        await this.queue.redis.hset(`worker:${this.workerId}`, ...Object.entries(this.heartBeat).flat());
+
     }
 }
 
