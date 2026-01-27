@@ -13,11 +13,11 @@ class RedisWorker {
     this.heartBeatInterval = null;
 
     this.heartBeat = {
-      WorkerId: this.workerId,
+      workerId: this.workerId,
       workerName: this.name,
       lastSeen: new Date().toISOString(),
       currentTask: this.currentTask || "",
-      status: "Active",
+      status: "active",
     };
 
     console.log(this.heartBeat);
@@ -42,7 +42,7 @@ class RedisWorker {
         const task = await this.queue.getNextTask(this.workerId);
         if (task) {
           this.currentTask = task;
-          this.heartBeat.currentTask = this.currentTask;
+          this.heartBeat.currentTask = this.currentTask.uniqueId;
           await this.processTask(task);
           this.currentTask = null;
         } else {
@@ -103,7 +103,7 @@ class RedisWorker {
   heartBeatFunction = async () => {
     this.heartBeatInterval = setInterval(async () => {
       this.heartBeat.lastSeen = new Date().toISOString();
-
+      console.log('⏰ Timer fired!');  // ← ADD THIS
       // this is wrong because redis doesn't store object , it only understand key value pair
       // so we will have to convert the object into key value pair using
       // ...Object.entries(data).flat()
