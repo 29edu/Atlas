@@ -15,7 +15,7 @@ if (keys.length > 0) await redis.del(...keys);
 const workerKeys = await redis.keys('worker:*');
 if (workerKeys.length > 0) await redis.del(...workerKeys);
 
-console.log('✅ Cleaned\n');
+console.log('Cleaned\n');
 
 // Create worker
 const worker = new RedisWorker('Worker-1', queue, taskHandlers);

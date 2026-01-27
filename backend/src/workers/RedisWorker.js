@@ -10,11 +10,10 @@ class RedisWorker {
         this.isRunning = false;
         this.currentTask = null;
         this.workerId = uuidv4();
-        this.workerName = this.name;
 
         this.heartBeat = {
             "WorkerId" : this.workerId,
-            "WorkerName" : this.workerName,
+            "workerName" : this.name,
             "lastSeen" : new Date().toISOString(),
             "currentTask" : this.currentTask || '',
             "status" : "Active"
@@ -34,7 +33,7 @@ class RedisWorker {
         //     }, 10000);
         // }
 
-        this.sendHeartBeat();
+        this.sendStartHeartBeat();
         this.heartBeatFunction();
         
 
@@ -84,7 +83,7 @@ class RedisWorker {
         clearInterval(this.heartBeatFunction)
         this.heartBeat.status= 'notActive';
         this.heartBeat.lastSeen = new Date().toISOString();
-        this.sendHeartBeat();
+        this.sendStopHeartBeat();
 
        
         if(this.currentTask) {
@@ -121,9 +120,17 @@ class RedisWorker {
         }, 10000)
     }
 
-    sendHeartBeat = async () => {
+    sendStartHeartBeat = async () => {
         this.heartBeat.lastSeen = new Date().toISOString();
+        console.log("Starting the heartbeat...", this.heartBeat);
         await this.queue.redis.hset(`worker:${this.workerId}`, ...Object.entries(this.heartBeat).flat());
+    }
+
+    sendStopHeartBeat = async () => {
+        
+        this.heartBeat.lastSeen = new Date().toISOString();
+        console.log("Stopping the heartBeat ....", this.heartBeat);
+        await this.queue.redis.hset(`Worker:${this.workerId}`, ...Object.entries(this.heartBeat).flat());
     }
 }
 
