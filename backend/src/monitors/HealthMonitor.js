@@ -30,7 +30,7 @@ class HealthMonitor {
             const task = await this.queue.redis.hgetall(taskKey);
 
             // check if task exist or not
-            if(!task || !task.uniqueId) {
+            if(!task || !task.id) {
                 continue;
             }
  
@@ -44,7 +44,7 @@ class HealthMonitor {
 
                 const isworkeralive = await this.isWorkerAlive(workerId);
                 if(!isworkeralive) {
-                    await this.recoverOrphanedTask(task.uniqueId);
+                    await this.recoverOrphanedTask(fromRedisTask.uniqueId);
                 } else {
                     console.log("Worker is working fine");
                 }

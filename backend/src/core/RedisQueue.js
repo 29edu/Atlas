@@ -71,7 +71,8 @@ async submit(taskData) {
     // More cpu usage
     // Require Manual Polling
 
-    const result = await this.redis.rpop(this.queueName);
+    // const result = await this.redis.rpop(this.queueName);
+    const result = await this.redis.brpop(this.queueName, 1);
     this.workerId = workerId;
     console.log("Started next task");
 
