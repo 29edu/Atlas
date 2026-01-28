@@ -15,7 +15,7 @@ class HealthMonitor {
         console.log("Starting the health Monitoring System...")
     
         this.isRunning = true;
-        this.intervalCheck = setInterval(() => {
+        this.checkInterval = setInterval(() => {
             this.checkWorkerHealth();
         }, 30000)
         
@@ -23,11 +23,18 @@ class HealthMonitor {
     
     async checkWorkerHealth() {
         
-        const allTask = await this.queue.redis.key('task:*');
+        const allTask = await this.queue.redis.keys('task:*'); //  it will always be keys not key
 
-        allTask.array.forEach(async element => {
+        for(let taskKey of allTask) {
 
-            const task = await this.queue.redis.hgetall(`task:${element}`);
+            const task = await this.queue.redis.hgetall(taskKey);
+
+            // check if task exist or not
+            if(!task || !task.uniqueId) {
+                continue;
+            }
+ 
+
             const fromRedisTask = Task.fromRedis(task);
 
             if(fromRedisTask.status === 'processing') {
@@ -42,7 +49,7 @@ class HealthMonitor {
                     console.log("Worker is working fine");
                 }
             }
-            });
+        };
     }
         
 
@@ -66,17 +73,18 @@ class HealthMonitor {
         taskObject.status = "pending";
         taskObject.workerId = null;
         const redisObjectTask = taskObject.toRedis();
-        this.queue.hset(`task:${taskId}`, ...Object.entries(redisObjectTask).flat());
-        this.queue.lpush(this.queue.name, taskId);
+        await this.queue.redis.hset(`task:${taskId}`, ...Object.entries(redisObjectTask).flat());
+        await this.queue.redis.lpush(this.queue.queueName, taskId);
     }
 
     async stop() {
         console.log('Stopping HealthMonitor')
         this.isRunning = false;
+        clearInterval(this.checkInterval)
     }
 }
 
-export default {HealthMonitor}
+export default HealthMonitor;
 
 // Mistake 
 // I was substracting worker last seen and current time in ISOString(), but i cannot substract in ISO string
