@@ -5,7 +5,7 @@ import { Task } from "../core/Task.js";
 class HealthMonitor {
     constructor(queue) {
         this.queue = queue;
-        this.isRunning = this.isRunning;
+        this.isRunning = false;
         this.checkInterval = null;
         this.WORKER_TIMEOUT = 30000; 
         this.deadTask = [];
@@ -14,7 +14,8 @@ class HealthMonitor {
     async start(){
         console.log("Starting the health Monitoring System...")
     
-        const intervalCheck = setInterval(() => {
+        this.isRunning = true;
+        this.intervalCheck = setInterval(() => {
             this.checkWorkerHealth();
         }, 30000)
         
@@ -34,8 +35,9 @@ class HealthMonitor {
                 const workerId = fromRedisTask.workerId;
                 const worker = await this.queue.redis.hgetall(`worker:${workerId}`);
 
-                if(!this.isWorkerAlive(workerId)) {
-                    this.recoverOrphanedTask(task.uniqueId);
+                const isworkeralive = await this.isWorkerAlive(workerId);
+                if(!isworkeralive) {
+                    await this.recoverOrphanedTask(task.uniqueId);
                 } else {
                     console.log("Worker is working fine");
                 }
@@ -49,7 +51,7 @@ class HealthMonitor {
 
         const currTime = new Date();
         const workerLastSeen = new Date(worker.lastSeen);
-        if(currTime - workerLastSeen > 30) {
+        if(currTime - workerLastSeen > 30000) { // time difference will come in ms
             return false;
         } else {
             return true;
@@ -63,8 +65,9 @@ class HealthMonitor {
         const taskObject = Task.fromRedis(task);
         taskObject.status = "pending";
         taskObject.workerId = null;
-        const redisObjectTask = Task.toRedis(taskObject);
-        this.queue.lpush(`task:${taskId}`, redisObjectTask);
+        const redisObjectTask = taskObject.toRedis();
+        this.queue.hset(`task:${taskId}`, ...Object.entries(redisObjectTask).flat());
+        this.queue.lpush(this.queue.name, taskId);
     }
 
     async stop() {
@@ -78,3 +81,4 @@ export default {HealthMonitor}
 // Mistake 
 // I was substracting worker last seen and current time in ISOString(), but i cannot substract in ISO string
 // taskObject.toRedis() is a method so we are using like this
+// Use async and await properly
