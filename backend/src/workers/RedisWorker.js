@@ -39,15 +39,20 @@ class RedisWorker {
 
     try {
       while (this.isRunning) {
+
         const task = await this.queue.getNextTask(this.workerId);
+
         if (task) {
           this.currentTask = task;
-          this.heartBeat.currentTask = this.currentTask.uniqueId;
+          this.heartBeat.currentTask = this.currentTask.uniqueId || "";
           await this.processTask(task);
           this.currentTask = null;
+          this.heartBeat.currentTask = "";
+
         } else {
           // If no task, wait a bit before checking again to allow event loop to process
-          await this.sleep(100);
+          console.log('Wait for a few seconds');
+          await this.sleep(1000);
         }
       }
     } catch (error) {
@@ -57,6 +62,7 @@ class RedisWorker {
   }
 
   async processTask(task) {
+
     console.log(`${this.name} redis worker is processing the task`);
     try {
       const response = this.taskHandler[task.type];
@@ -84,7 +90,7 @@ class RedisWorker {
     this.heartBeat.status = "notActive";
     this.heartBeat.lastSeen = new Date().toISOString();
 
-    this.sendStopHeartBeat();
+    await this.sendStopHeartBeat();
 
     if (this.currentTask) {
       console.log(`Waiting for current task to finish`);
@@ -101,25 +107,28 @@ class RedisWorker {
   };
 
   heartBeatFunction = async () => {
+    if (this.heartBeatInterval) {
+        clearInterval(this.heartBeatInterval);
+    }
+
+
     this.heartBeatInterval = setInterval(async () => {
-      this.heartBeat.lastSeen = new Date().toISOString();
-      console.log('⏰ Timer fired!');  // ← ADD THIS
-      // this is wrong because redis doesn't store object , it only understand key value pair
-      // so we will have to convert the object into key value pair using
-      // ...Object.entries(data).flat()
+      console.log('⏰ Timer fired!');
 
-      // await this.queue.redis.hset(
-      //     `worker:${this.workerId}`, this.heartBeat
-      // )
+      try {
+        this.heartBeat.lastSeen = new Date().toISOString();
+        
+        await this.queue.redis.hset(
+          `worker:${this.workerId}`,
+          ...Object.entries(this.heartBeat).flat(),
+        );
 
-      await this.queue.redis.hset(
-        `worker:${this.workerId}`,
-        ...Object.entries(this.heartBeat).flat(),
-      );
-
-      console.log(this.heartBeat);
+        console.log('✅ Heartbeat updated:', this.heartBeat.lastSeen);
+      } catch (error) {
+        console.error('❌ Heartbeat failed:', error.message);
+      }
     }, 10000);
-  };
+    };
 
   sendStartHeartBeat = async () => {
     this.heartBeat.lastSeen = new Date().toISOString();

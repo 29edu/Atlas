@@ -61,9 +61,22 @@ async submit(taskData) {
 }
 
   async getNextTask(workerId) {
-    const result = await this.redis.brpop(this.queueName, 0);
+
+    console.log("Started next task");
+
+    // brpop is a blocking event loop, so it won't allow further opeations indefinately until a task is assigned, 
+    // const result = await this.redis.brpop(this.queueName, 1); 
+
+    // rpop is a non-blocking event loop, that either return a null value or some value
+    // More cpu usage
+    // Require Manual Polling
+
+    const result = await this.redis.rpop(this.queueName);
     this.workerId = workerId;
+    console.log("Started next task");
+
     if (!result) {
+      console.log("No result");
       return null;
     }
     
@@ -76,6 +89,7 @@ async submit(taskData) {
     const redisData = convertedTask.toRedis();
     await this.redis.hset(`task:${taskId}`, redisData);
 
+    console.log("Going out of getnex task");
     return convertedTask;
   }
 
