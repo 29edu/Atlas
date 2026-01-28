@@ -22,41 +22,34 @@ class HealthMonitor {
     
     async checkWorkerHealth() {
         
-        const allTask = await this.queue.get('task:*');
+        const allTask = await this.queue.redis.key('task:*');
 
-        while(this.isRunning) {
-            allTask.array.forEach(element => {
+        allTask.array.forEach(element => {
 
-                const task = this.queue.hgetall(element);
-                const fromRedisTask = Task.fromRedis(task);
+            const task = this.queue.redis.hgetall(element);
+            const fromRedisTask = Task.fromRedis(task);
 
-                if(fromRedisTask.status === 'processing') {
-                    const workerId = fromRedisTask.workerId;
+            if(fromRedisTask.status === 'processing') {
 
-                    const worker = this.queue.hgetall(workerId);
+                const workerId = fromRedisTask.workerId;
+                const worker = this.queue.redis.hgetall(workerId);
 
-                    const currentDate = new Date().toISOString();
-                    if(currentDate - worker.lastSeen > 30) {
-                        console.log(`Worker${workerId} is dead`);
-
-                        const recoveredTask = worker.currentTask;
-                        this.deadTask.push(recoveredTask)
-
-                    } else {
-                        console.log(`Worker:${workerId} is Working Properly`);
-                    }
+                if(!this.isWorkerAlive(workerId)) {
+                    this.recoverOrphanedTask(task.uniqueId);
+                } else {
+                    console.log("Worker is working fine");
                 }
+            }
             });
-        }
-        
-        
     }
+        
 
     async isWorkerAlive(workerId){
-        const worker = this.queue.hgetall(workerId);
+        const worker = this.queue.redis.hgetall(workerId);
 
-        const currTime = new Date().toISOString();
-        if(currTime - worker.lastSeen > 30) {
+        const currTime = new Date();
+        const workerLastSeen = new Date(worker.lastSeen);
+        if(currTime - workerLastSeen > 30) {
             return false;
         } else {
             return true;
@@ -66,7 +59,7 @@ class HealthMonitor {
     async recoverOrphanedTask(taskId) {
         console.log('Recovering orphaned task: $')
 
-        const task = this.queue.hgetall(taskId);
+        const task = this.queue.redis.hgetall(taskId);
         const taskObject = Task.fromRedis(task);
         taskObject.status = "pending";
         taskObject.workerId = null;
@@ -79,3 +72,7 @@ class HealthMonitor {
         this.isRunning = false;
     }
 }
+
+// Mistake 
+// I was substracting worker last seen and current time in ISOString(), but i cannot substract in ISO string
+// taskObject.toRedis() is a method so we are using like this
