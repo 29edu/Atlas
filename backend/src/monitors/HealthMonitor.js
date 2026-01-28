@@ -24,15 +24,15 @@ class HealthMonitor {
         
         const allTask = await this.queue.redis.key('task:*');
 
-        allTask.array.forEach(element => {
+        allTask.array.forEach(async element => {
 
-            const task = this.queue.redis.hgetall(element);
+            const task = await this.queue.redis.hgetall(`task:${element}`);
             const fromRedisTask = Task.fromRedis(task);
 
             if(fromRedisTask.status === 'processing') {
 
                 const workerId = fromRedisTask.workerId;
-                const worker = this.queue.redis.hgetall(workerId);
+                const worker = await this.queue.redis.hgetall(`worker:${workerId}`);
 
                 if(!this.isWorkerAlive(workerId)) {
                     this.recoverOrphanedTask(task.uniqueId);
@@ -45,7 +45,7 @@ class HealthMonitor {
         
 
     async isWorkerAlive(workerId){
-        const worker = this.queue.redis.hgetall(workerId);
+        const worker = await this.queue.redis.hgetall(`worker:${workerId}`);
 
         const currTime = new Date();
         const workerLastSeen = new Date(worker.lastSeen);
@@ -59,7 +59,7 @@ class HealthMonitor {
     async recoverOrphanedTask(taskId) {
         console.log('Recovering orphaned task: $')
 
-        const task = this.queue.redis.hgetall(taskId);
+        const task = await this.queue.redis.hgetall(`task:${taskId}`);
         const taskObject = Task.fromRedis(task);
         taskObject.status = "pending";
         taskObject.workerId = null;
@@ -72,6 +72,8 @@ class HealthMonitor {
         this.isRunning = false;
     }
 }
+
+export default {HealthMonitor}
 
 // Mistake 
 // I was substracting worker last seen and current time in ISOString(), but i cannot substract in ISO string
