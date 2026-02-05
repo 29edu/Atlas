@@ -37,7 +37,7 @@ export default function LoginForm() {
             if(success) {
                 toast.success('LoginSucessful')
                 console.log('Data submitted to the server');
-                navigate('/dashboard');
+                // navigate('/dashboard');
                 
             } else {
                 toast.error('Failed to login');

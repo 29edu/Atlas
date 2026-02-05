@@ -57,3 +57,47 @@ build/
 # Debug
 *.tsbuildinfo
 .eslintcache
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Dependencies lock files (optional - keep if you want consistent installs)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Storybook
+storybook-static/
+
+# Misc
+.vercel
+.netlify
+.turbo
+*.swp
+*~
+.project
+.classpath
+.settings/
+
+# macOS
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+[Tt]humbs.db
+[Tt]humbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
