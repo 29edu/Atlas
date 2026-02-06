@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import connectDB from './config/db.js';
+import authRoutes from './routes/auth.routes.js'
 
 const app = express();
 app.use(cors())
@@ -10,6 +11,9 @@ const PORT = 5082
 
 // Connect to Mongodb
 await connectDB();
+
+// Routes
+app.use('/', authRoutes)
 
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`)

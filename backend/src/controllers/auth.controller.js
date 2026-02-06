@@ -1,101 +1,102 @@
 import { User } from "../models/user.model.js";
-import jwt from 'jsonwebtoken'
-import bcrypt from 'bcrypt'
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const JWT_SECRET = process.env.JWT_SECRET || "mysecetkey";
 
-const signUp = async (req, res) =>  {
-    const {name, email, password} = req.body;
+const signUp = async (req, res) => {
+  const { firstName, lastName, email, password } = req.body;
 
-    try {
-        if(!name || !email || !password) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid  Input"
-            })
-        }
-
-        const user = await User.findOne({email});
-        if(user) {
-            return res.status(409).json({
-                success: false,
-                message: "User Already Exist"
-            })
-        }
-
-        const saltRound= 10;
-        // const myPlaintextPassword = 's0/\/\p4$$w0rD';
-
-        // Hash Password
-        const hashedPassword = await bcrypt.hash(password, saltRound);
-
-        const newUser = await User.create({
-            name,
-            email, 
-            password: hashedPassword
-        })
-
-        res.status(200).json({
-            success: true,
-            message: "User Created Successfully",
-            data: newUser
-        })
-
-    } catch(error) {
-
-        if(error.name === 'ValidationError') { // Validaion Error due to constraints on the schema
-            return res.status(400).json({
-                sucess: false, 
-                message: error.message
-            })
-        }
-
-        console.error("Found some error in the auth controller", error);
+  try {
+    if (!firstName || !lastName || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid  Input",
+      });
     }
-}
+
+    const user = await User.findOne({ email });
+    if (user) {
+      return res.status(409).json({
+        success: false,
+        message: "User Already Exist",
+      });
+    }
+
+    const saltRound = 10;
+    // const myPlaintextPassword = 's0/\/\p4$$w0rD';
+
+    // Hash Password
+    const hashedPassword = await bcrypt.hash(password, saltRound);
+
+    const newUser = await User.create({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "User Created Successfully",
+      data: newUser,
+    });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      // Validaion Error due to constraints on the schema
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    console.error("Found some error in the auth controller", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
 
 const login = async (req, res) => {
+  const { email, password } = req.body;
 
-    const {email, password} = req.body;
+  try {
+    const user = await User.findOne({ email });
 
-    try {
-        const user = await User.findOne({email});
-
-        if(!user) {
-            return res.status(400).json({
-                success: true,
-                message: "Invalid Email or Password"
-            })
-        }
-
-        // compare password
-        const isPasswordMatch = await bcrypt.compare(password, user.password);
-
-        if(!isPasswordMatch) {
-            return res.status(401).json({ message: "Invalid Credentials"})
-        }
-
-        // create jwt
-        const token = jwt.sign(
-            {id: user._id, email: user.email},
-            JWT_SECRET,
-            {expiresIn: "1h"}
-        );
-
-        // send token
-        res.status(200).json({
-            success: true,
-            message: "Login Successful",
-            token
-        })
-
-    } catch (error) {
-
-        console.log("Error in the login controller", error);
-
-        res.status(500).json({
-            success: false,
-            message: "Server error"
-        });
+    if (!user) {
+      return res.status(400).json({
+        success: true,
+        message: "Invalid Email or Password",
+      });
     }
-}
+
+    // compare password
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordMatch) {
+      return res.status(401).json({ message: "Invalid Credentials" });
+    }
+
+    // create jwt
+    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    // send token
+    res.status(200).json({
+      success: true,
+      message: "Login Successful",
+      token,
+    });
+  } catch (error) {
+    console.log("Error in the login controller", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+export { signUp, login };
