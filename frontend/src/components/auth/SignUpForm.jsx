@@ -35,6 +35,7 @@ export default function SignUpForm() {
       });
 
       if (response.data.success) {
+        navigate('/dashboard')
         toast.success("Sign Up successful");
       } else {
         toast.error("Sign up failed");
