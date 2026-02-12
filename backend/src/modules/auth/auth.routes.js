@@ -1,15 +1,15 @@
-import express from 'express'
+import express from "express";
 const router = express.Router();
-import { login, signUp } from './auth.controller.js';
+import { login, signUp } from "./auth.controller.js";
 
 const timeLog = (req, res, next) => {
-    console.log("Time: ", new Date().toLocaleString())
-    next()
-}
+  console.log("Time: ", new Date().toLocaleString());
+  next();
+};
 
-router.use(timeLog)
+router.use(timeLog);
 
-router.post('/login', login)
-router.post('/signup', signUp)
+router.post("/login", login);
+router.post("/signup", signUp);
 
 export default router;

@@ -128,7 +128,9 @@ frontend/src/
 ## Module Organization Principles
 
 ### Backend Modules
+
 Each module follows this pattern:
+
 - **Model**: Database schema and model definition
 - **Controller**: Request handlers and business logic
 - **Routes**: API endpoint definitions
@@ -136,7 +138,9 @@ Each module follows this pattern:
 - **index.js**: Centralized exports for the module
 
 ### Frontend Features
+
 Each feature follows this pattern:
+
 - **Components**: UI components specific to the feature
 - **Pages**: Full page components
 - **Hooks**: Custom React hooks for the feature
@@ -147,34 +151,38 @@ Each feature follows this pattern:
 ## Import Guidelines
 
 ### Backend
+
 ```javascript
 // Import from modules
-import { User, login, signUp, authRoutes } from './modules/auth/index.js';
+import { User, login, signUp, authRoutes } from "./modules/auth/index.js";
 
 // Import from shared
-import connectDB from './shared/config/db.js';
-import authMiddleware from './shared/middlewares/auth.middleware.js';
+import connectDB from "./shared/config/db.js";
+import authMiddleware from "./shared/middlewares/auth.middleware.js";
 ```
 
 ### Frontend
+
 ```javascript
 // Import from features
-import { LoginForm, SignUpForm, AuthRoutes } from './features/auth';
+import { LoginForm, SignUpForm, AuthRoutes } from "./features/auth";
 
 // Import from shared
-import Button from './shared/components/Button';
-import useAuth from './shared/hooks/useAuth';
+import Button from "./shared/components/Button";
+import useAuth from "./shared/hooks/useAuth";
 ```
 
 ## Next Steps
 
 ### Backend
+
 1. Create controllers for products, cart, and orders
 2. Create routes for each module
 3. Add service layer for complex business logic
 4. Implement API endpoints for CRUD operations
 
 ### Frontend
+
 1. Create dashboard page
 2. Implement product listing and details pages
 3. Build cart functionality
