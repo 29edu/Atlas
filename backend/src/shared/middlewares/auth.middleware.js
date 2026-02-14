@@ -1,13 +1,14 @@
 import jwt from 'jsonwebtoken'
-import express from 'express'
 
-const jwtAuth = (req, res, next) => {
+const JWT_SECRET = process.env.JWT_SECRET || "mysecretkey";
+
+const authMiddleware = (req, res, next) => {
 
     try {
-
+        // Get token from header
         const authHeader = req.headers.authorization;
 
-        // check header
+        // check if token exist or not
         if(!authHeader || !authHeader.startsWith("Bearer: ")) {
             return res.status(401).json({
                 success: false,
@@ -15,19 +16,29 @@ const jwtAuth = (req, res, next) => {
             })
         }
 
-        // extract token
+        // extract token (remove "Bearer " prefi)
         const token = authHeader.split(" ")[1];
 
         // verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         // attach user to request
-        req.user = decoded;
+        req.user =  {
+            id: decoded.id,
+            email: decoded.email,
+        }
 
         // move to controller
         next();
     } catch (error) {
         console.log("Error in jwt token", error)
+
+        if(error.name === 'TokenExpiredError') {
+            return res.status(401).json({
+                success: false,
+                message: "Token expired. Please login again."
+            })
+        }
         
         return res.status(401).json({
             success: false,
@@ -36,4 +47,4 @@ const jwtAuth = (req, res, next) => {
     }
 }
 
-export default jwtAuth;
+export default authMiddleware;

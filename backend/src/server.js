@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./shared/config/db.js";
 import authRoutes from "./modules/auth/auth.routes.js";
+import productRoutes from "./modules/products/product.routes.js"
 
 const app = express();
 app.use(cors());
@@ -13,6 +14,7 @@ await connectDB();
 
 // Routes
 app.use("/", authRoutes);
+app.use("/", productRoutes); 
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);

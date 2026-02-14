@@ -4,6 +4,14 @@ import bcrypt from "bcrypt";
 
 const JWT_SECRET = process.env.JWT_SECRET || "mysecetkey";
 
+// Function to generate JWT token
+// Generate fution
+const generateToken = (userId, email) => {
+  return jwt.sign({ id: userId, email: email }, JWT_SECRET, {
+    expiresIn: "1h",
+  });
+} 
+
 const signUp = async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
 
@@ -36,11 +44,22 @@ const signUp = async (req, res) => {
       password: hashedPassword,
     });
 
+    const token = generateToken(newUser._id, email);
+
     res.status(200).json({
       success: true,
       message: "User Created Successfully",
-      data: newUser,
+      data:  {
+        user: {
+          id: newUser._id,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          email: newUser.email
+        },
+        token: token, // sending token to frontend
+      }
     });
+
   } catch (error) {
     if (error.name === "ValidationError") {
       // Validaion Error due to constraints on the schema
@@ -78,16 +97,22 @@ const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid Credentials" });
     }
 
-    // create jwt
-    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    // Token Generation
+    const token = generateToken(user._id, email);
 
     // send token
     res.status(200).json({
       success: true,
       message: "Login Successful",
-      token,
+      data: {
+        user: {
+          id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+        },
+        token: token
+      }
     });
   } catch (error) {
     console.log("Error in the login controller", error);
