@@ -69,5 +69,13 @@ function AuthProvider({children}) {
     const logout = () => {
         setToken(null);
         setUser(null);
+        setIsAuthenticated(false);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/login");
     }
+
+    return (
+        <AuthContext.Provider value={{isAuthenticated, user, token, loading, login, logout}}>{children}</AuthContext.Provider>
+    )
 }

@@ -7,7 +7,7 @@ class Task {
     priority = 5,
     maxRetry = 3,
     result = false,
-    workerId = null
+    workerId = null,
     
   }) {
     this.uniqueId = uuidv4();
@@ -24,13 +24,26 @@ class Task {
     // Retry tracking
     this.retryCount = 0;
     this.maxRetry = maxRetry;
-    this.priority = priority;
+    this.priority = (Number.isInteger(priority) ? priority : null);
 
     // Error tracking
     this.lastError = null;
 
     // Tracking which worker is working on the task
     this.workerId = workerId || null;
+  }
+
+  static getPriorityCategory(priority) {
+    if(priority == null) {
+      return 'Invalid Priority'
+    }
+    if(priority>=1 && priority<=3) {
+      return 'critical';
+    } else if(priority>=4 && priority<=6) {
+      return 'high';
+    } else {
+      return 'low'
+    }
   }
 
   // Create a task
