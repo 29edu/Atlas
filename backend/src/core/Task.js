@@ -122,7 +122,7 @@ class Task {
       retryCount: this.retryCount.toString(),
       maxRetry: this.maxRetry.toString(),
       priority: this.priority.toString(),
-      lastError: this.lastError || "",
+      lastError: this.lastError || "", // I use this because if somehow lastError is null and if i do null.toString() then i use "" to avoid crash in case lastError is null
       workerId: this.workerId || null,
     };
   }
@@ -139,27 +139,6 @@ class Task {
     if (value instanceof Date) return value.toISOString();
     return new Date(value).toISOString();
   };
-
-  static fromRedis(data) {
-    const task = new Task({
-      type: data.type,
-      payload: JSON.parse(data.payload),
-      userId: data.userId,
-      priority: parseInt(data.priority),
-      maxRetry: parseInt(data.maxRetry),
-    });
-
-    task.uniqueId = data.id;
-    task.status = data.status;
-    task.createdAt = data.createdAt;
-    task.startedAt = data.startedAt || null;
-    task.completedAt = data.completedAt || null;
-    task.failedAt = data.failedAt || null;
-    task.retryCount = parseInt(data.retryCount);
-    task.lastError = data.lastError || null;
-
-    return task;
-  }
 }
 
 export { Task };

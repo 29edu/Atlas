@@ -157,3 +157,10 @@ export { RedisQueue };
 // string(value) - safe for all for conversion including null and undefined, never throw an error
 // value.toString() - not safe for null and undefined, the program will crash
 // string is preferred over toString()
+
+// Understand the difference between hset and lpush, lpush behave like queue where hset stores data in the key value pair 
+// for lpush order matters where as for hset ordering doesn't matter
+// data structures used :  lpush -> list, hset->hash
+// Usage: While making a task queue we use lpush and while making profiles we use haset because it contains different information like  name, emailid, password
+//    from unique id.
+// 
