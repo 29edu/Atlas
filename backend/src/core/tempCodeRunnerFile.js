@@ -1,0 +1,166 @@
+import { Task } from "./Task.js";
+import Redis from "ioredis";
+
+class RedisQueue {
+  constructor() {
+    this.redis = new Redis({
+      host: "localhost",
+      port: 6379,
+    });
+
+    this.queueName = "tasks:pending";
+    this.workerId = null;
+  }
+
+//   async submit(taskData) {
+//     console.log("Submit called with:", taskData);
+//     const task = new Task(taskData); //  creating task object
+//     console.log("Task created:", task.uniqueId);
+//     const redisData = task.toRedis(); // converting to redis format
+//     console.log("Redis data:", JSON.stringify(redisData));
+
+//     await this.redis.hset(`task:${task.uniqueId}`, redisData); // storing in hash
+//     console.log("Stored in hset", taskData);
+//     await this.redis.lpush(this.queueName, task.uniqueId); // pushing id to queue
+//     console.log(`Task submitted to Redis : ${task.uniqueId}`);
+//     return task;
+//   }
+
+async submit(taskData) {
+
+  console.log("Submit called with:", taskData);
+  const task = new Task(taskData);
+  console.log("Task created:", task.uniqueId);
+  const redisData = task.toRedis();
+  console.log("Redis data:", JSON.stringify(redisData));
+
+  console.log("🔹 About to call hset...");
+  
+  try {
+    // Add 5 second timeout
+    await Promise.race([
+      this.redis.hset(`task:${task.uniqueId}`, redisData),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('hset timeout after 5s')), 5000)
+      )
+    ]);
+
+    console.log("🔹 hset completed!");
+    
+  } catch (error) {
+    console.error("❌ hset failed:", error.message);
+    throw error;
+  }
+  
+  console.log("🔹 About to call lpush...");
+  await this.redis.lpush(this.queueName, task.uniqueId);
+  console.log("🔹 lpush completed!");
+  
+  console.log(`✅ Task submitted to Redis: ${task.uniqueId}`);
+  return task;
+}
+
+  async getNextTask(workerId) {
+
+    console.log("Started next task");
+
+    // brpop is a blocking event loop, so it won't allow further opeations indefinately until a task is assigned, 
+    // const result = await this.redis.brpop(this.queueName, 1); 
+
+    // rpop is a non-blocking event loop, that either return a null value or some value
+    // More cpu usage
+    // Require Manual Polling
+
+    // const result = await this.redis.rpop(this.queueName);
+    const result = await this.redis.brpop(this.queueName, 1);
+    this.workerId = workerId;
+    console.log("Started next task");
+
+    if (!result) {
+      console.log("No result");
+      return null;
+    }
+    
+    const taskId = result[1];
+    const taskData = await this.redis.hgetall(`task:${taskId}`);
+
+    const convertedTask = Task.fromRedis(taskData); // convert to task Object
+    convertedTask.markStarted(this.workerId);
+
+    const redisData = convertedTask.toRedis();
+    await this.redis.hset(`task:${taskId}`, redisData);
+
+    console.log("Going out of getnex task");
+    return convertedTask;
+  }
+
+  async completeTask(taskId) {
+    const taskData = await this.redis.hgetall(`task:${taskId}`);
+
+    // Quick Reminder: - I can check whether the task exist or not so i can add a line to check
+    if (!taskData || !taskData.id) {
+      console.log(`The task ${taskId} doesn't exist`);
+      return;
+    }
+
+    const convertedTask = Task.fromRedis(taskData);
+    await convertedTask.markCompleted();
+
+    // saving to redis , also to save the task to redis i need to first convert it to redis
+    const redisData = convertedTask.toRedis();
+    await this.redis.hset(`task:${taskId}`, redisData);
+    return convertedTask;
+  }
+
+  async failTask(taskId, error) {
+    const taskData = await this.redis.hgetall(`task:${taskId}`);
+
+    if (!taskData || !taskId) {
+      console.log(`The ${taskId} is not found`);
+      return;
+    }
+
+    const convertedTask = Task.fromRedis(taskData);
+    await convertedTask.markFailed(error);
+
+    const redisData = convertedTask.toRedis();
+    await this.redis.hset(`task:${taskId}`, redisData);
+
+    if (convertedTask.canRetry()) {
+      await this.redis.lpush(this.queueName, taskId);
+      console.log(
+        ` Task ${taskId} will retry (${convertedTask.retryCount}/${convertedTask.maxRetry})`
+      );
+    } else {
+      console.log(`Task ${taskId}failed permanently`);
+    }
+  }
+
+  async getStatus() {
+    const pending = await this.redis.llen(this.queueName);
+
+    return {
+      pending,
+      processing: 0,
+      completed: 0,
+      failed: 0,
+    };
+  }
+}
+
+export { RedisQueue };
+
+// Remember We use the same queue name so that only one task at a time can be performed from that queue,
+// Suppose if i use another queue name, then it will be independent from other queue name and this multiple actions can be performed
+// So two task is completing simultaneously in the different queue at the same time, thus it is advantage for completing multiple task
+
+// string(value) - safe for all for conversion including null and undefined, never throw an error
+// value.toString() - not safe for null and undefined, the program will crash
+// string is preferred over toString()
+
+// Understand the difference between hset and lpush, lpush behave like queue where hset stores data in the key value pair 
+// for lpush order matters where as for hset ordering doesn't matter
+// data structures used :  lpush -> list, hset->hash
+// Usage: While making a task queue we use lpush and while making profiles we use haset because it contains different information like  name, emailid, password
+//    from unique id.
+// 
