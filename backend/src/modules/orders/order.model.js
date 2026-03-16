@@ -7,11 +7,23 @@ const orderSchema = new mongoose.Schema({
         required: true,
     },
 
-    products: [{
-        productId: ObjectId,
-        quantity: Number,
-        priceAtPurchase: Number
-    }],
+    products: [
+        {
+            productId : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Product"
+            },
+
+            quantity: {
+                type: Number,
+                required: true
+            },
+            priceAtPurchase: {
+                type: Number,
+                required: true,
+            }
+        }
+    ],
 
     total: {
         type: Number,
@@ -20,17 +32,20 @@ const orderSchema = new mongoose.Schema({
 
     status: {
         type: String,
-        enum: ["pending", "processing", "completed", "failed"],
+        enum: ["pending", "payment_processing", "paid", "confirmed", "shipped", "delivered", "cancelled", "payment_failed"],
     },
 
-    tasks: [{
-        type: String, 
-        status: String,
-        priority: Number,
-        completedAt: Date,
-    }],
+    createdAt: { // when the order was placed
+        type: Date,
+        default: Date.now
+    },
 
-    createdAt: Date
+    updatedAt: { // when the status of the order is changed
+        
+        type: Date,
+        default: Date.now
+    } 
+
 })
 
 const Order = mongoose.model("Model", orderSchema);
@@ -38,3 +53,8 @@ const Order = mongoose.model("Model", orderSchema);
 export {
     Order
 }
+
+// Array Of Object:-
+// Scenario:- When a user orders so amny products, different products and about the order has to be stored somewhere.
+// Now i need an array of object where the details of the products ordered by the user can be stored. An user can order many products so i need to store
+// the productsId, price at purchase, quantity of that product
