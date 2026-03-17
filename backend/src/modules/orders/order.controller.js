@@ -44,4 +44,7 @@ const getOrders = async (req, res) => {
     }
 }
 
-// Difference
+export  {
+    createOrder,
+    getOrders
+}
