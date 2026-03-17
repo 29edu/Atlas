@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Address from "../address/address.model.js";
 
 const orderSchema = new mongoose.Schema({
     userId: {
@@ -34,6 +35,24 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ["pending", "payment_processing", "paid", "confirmed", "shipped", "delivered", "cancelled", "payment_failed"],
     },
+
+    payment: {
+        paymentId: String,
+        method: {
+            type: String,
+            enum: ["UPI", "CASH", "DEBIT_CARD", "CREDIT_CARD", "NET_BANKING", "WALLET"]
+        },
+        status: {
+            type: String,
+            enum: ["pending", "success", "failed"],
+        }
+    },
+
+    shippingAddress: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Address",
+        required: true
+    }
 
 }, {
     timestamps: true

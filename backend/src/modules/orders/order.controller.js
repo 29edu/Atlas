@@ -1,4 +1,5 @@
 
+import Address from "../address/address.model";
 import { Order } from "./order.model";
 
 const createOrder =  async (req, res) => {
@@ -6,13 +7,31 @@ const createOrder =  async (req, res) => {
     try {
         
         const userId = req.user.id;
-        const { products, total, status} = req.body;
+        
+        const { products, total, status, paymentMethod, addressId} = req.body;
+        const shippingAddress = await Address.findOne({
+            _id: addressId,
+            userId
+        })
+
+        if(!shippingAddress) {
+            return res.status(404).json({
+                success: false,
+                message: "Address Not found"
+            })
+        }
 
         const order = await Order.create({
             userId,
             products, 
             total, 
-            status
+            status,
+            paymentMethod : {
+                method: paymentMethod,
+                status: "pending"
+            },
+            shippingAddress: shippingAddress._id
+            
         });
 
         res.status(201).json({
@@ -48,3 +67,4 @@ export  {
     createOrder,
     getOrders
 }
+

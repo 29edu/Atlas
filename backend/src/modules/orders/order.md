@@ -11,4 +11,9 @@
 
     But const order = Order.findById(userId); // It doesn't need curly braces. Internally it does automatically
 
-    
+## Payment Concept
+
+    There are two different Moments in Payment FLow
+    1. Order Creating
+    2. Payment Completion
+
