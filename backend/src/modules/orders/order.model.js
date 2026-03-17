@@ -35,20 +35,11 @@ const orderSchema = new mongoose.Schema({
         enum: ["pending", "payment_processing", "paid", "confirmed", "shipped", "delivered", "cancelled", "payment_failed"],
     },
 
-    createdAt: { // when the order was placed
-        type: Date,
-        default: Date.now
-    },
-
-    updatedAt: { // when the status of the order is changed
-        
-        type: Date,
-        default: Date.now
-    } 
-
+}, {
+    timestamps: true
 })
 
-const Order = mongoose.model("Model", orderSchema);
+const Order = mongoose.model("Order", orderSchema);
 
 export {
     Order
