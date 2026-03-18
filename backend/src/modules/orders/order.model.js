@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Address from "../address/address.model.js";
 
 const orderSchema = new mongoose.Schema({
     userId: {

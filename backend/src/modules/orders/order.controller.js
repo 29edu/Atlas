@@ -1,6 +1,6 @@
 
-import Address from "../address/address.model";
-import { Order } from "./order.model";
+import Address from "../address/address.model.js";
+import { Order } from "./order.model.js";
 
 const createOrder =  async (req, res) => {
 
