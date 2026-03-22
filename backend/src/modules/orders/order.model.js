@@ -66,4 +66,4 @@ export {
 // Array Of Object:-
 // Scenario:- When a user orders so amny products, different products and about the order has to be stored somewhere.
 // Now i need an array of object where the details of the products ordered by the user can be stored. An user can order many products so i need to store
-// the productsId, price at purchase, quantity of that product
+// the productsId, price at purchase, quantity of that product.
