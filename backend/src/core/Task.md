@@ -1,4 +1,5 @@
 # type
+
     It tells what kind of action/event/ job/ message this is
     It answers the question : "What is happening?"
     like "DELIVER_PACKAGE"
@@ -23,13 +24,14 @@
     Without type i don't know the object
     I have to use if-else and it will look ugly
 
-# Payload
+## Payload
+
     Payload is the actual data needed to perform that action
     It answers "What information do i need to do this job?"
 
     Example:-
         Type: "DELIVERY_PACKAGE"
-        Payload:- Address, Phone_number, item, intstructions
+        Payload:- Address, Phone_number, item, instructions
 
         Email Job:-
             {
@@ -64,7 +66,8 @@
         Putting directly is bad like
             constructor(email, action, amount, message, phone)
 
-# Restore State
+## Restore State
+
     Scenario:
         A user submit the details and saved in database. Now worker picks the task and worker crashes the server or server restarts,
         and reloads tasks from storage.
