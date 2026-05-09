@@ -7,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "mysecetkey";
 // Function to generate JWT token
 // Generate fution
 const generateToken = (userId, email) => {
-  return jwt.sign({ id: userId, email: email }, JWT_SECRET, {
+  return jwt.sign({ id: userId, email: email }, JWT_SECRET, {  // Return json token string
     expiresIn: "1h",
   });
 } 
@@ -35,7 +35,7 @@ const signUp = async (req, res) => {
     // const myPlaintextPassword = 's0/\/\p4$$w0rD';
 
     // Hash Password
-    const hashedPassword = await bcrypt.hash(password, saltRound);
+    const hashedPassword = await bcrypt.hash(password, saltRound); // contains the hashed password
 
     const newUser = await User.create({
       firstName,
@@ -46,7 +46,7 @@ const signUp = async (req, res) => {
 
     const token = generateToken(newUser._id, email);
 
-    res.status(200).json({
+    res.status(201).json({ // 201 code because it is created. 200 means OK
       success: true,
       message: "User Created Successfully",
       data:  {

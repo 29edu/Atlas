@@ -1,4 +1,17 @@
-# type
+# Work
+
+    The main work of the task is to store the details about the event or action or task. It doesn't do any work. It just stores the data
+    and it is like data object.
+
+        Eg:- If there is a parcel, then it contains the information about where that parcel is going , whose parcel is this, what is inside
+        , when this delivery is sent etc. It doesn't do any work. It just contains infromation.
+
+    When I do FromRedis, I create a new Object because when the data comes from redis, it is in raw string format so i cannot perform any 
+    method on that. Hence I need to covert the raw strings into object.
+
+    In ToRedis(), we don't do this because OBJECT already Exist.
+
+## type
 
     It tells what kind of action/event/ job/ message this is
     It answers the question : "What is happening?"

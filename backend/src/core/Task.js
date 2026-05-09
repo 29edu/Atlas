@@ -31,6 +31,7 @@ class Task {
 
     // Tracking which worker is working on the task
     this.workerId = workerId || null;
+
   }
 
   static getPriorityCategory(priority) {
@@ -59,10 +60,13 @@ class Task {
     this.retryCount++;
     this.lastError = error;
     this.failedAt = new Date().toISOString();
+
     if (this.retryCount >= this.maxRetry) {
       this.status = "failed";
       console.log("Maximum retry reached .... Task is completely failed");
+
     } else {
+
       this.status = "pending";
       console.log("Task is failed. Can be started");
     }
@@ -82,6 +86,7 @@ class Task {
     }
   }
 
+  // The data handled by constructor put it inside the onject and for rest , add later.
   static fromRedis(data) {
     const newTask = new Task({
       type: data.type,

@@ -56,3 +56,14 @@
     Bcrypt turns "mypassword123" into "$2b$10$X7Yz..."
     This hash cannot be reversed. To verify it you compare:
         bcrypt.compare(inputPassword, storedHash)
+
+
+## TimeStamp
+
+    In Auth Mode models, we add timestamp = true, it means two new object mongodb me automatilcally create ho jayega, 
+    1. CreatedAt
+    2. UpdatedAt
+
+    And yah dono object ke form me rahta hai toh methods espe apply ho sakta hai. So mujhe externally nahi likha parta ke cratedAt and updatedAt
+
+    
