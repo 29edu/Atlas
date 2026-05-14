@@ -22,7 +22,7 @@ function AuthProvider({children}) {
             setIsAuthenticated(true);
         }
 
-        setLoading(true);
+        setLoading(false);
     }, []);
 
     //login function
