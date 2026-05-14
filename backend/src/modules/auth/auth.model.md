@@ -57,7 +57,6 @@
     This hash cannot be reversed. To verify it you compare:
         bcrypt.compare(inputPassword, storedHash)
 
-
 ## TimeStamp
 
     In Auth Mode models, we add timestamp = true, it means two new object mongodb me automatilcally create ho jayega, 
