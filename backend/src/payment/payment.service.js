@@ -9,7 +9,7 @@ class PaymentService {
     // Create a razorpay order (called when the user hits checkout)
 
     constructor() {
-        const razorpay = new Razorpay({
+        this.razorpay = new Razorpay({
             key_id: process.env.RAZORPAY_KEY_ID,
             key_secret: process.env.RAZORPAY_KEY_SECRET
         })
@@ -70,7 +70,7 @@ class PaymentService {
                 paymentStatus: "PENDING",
                 transaction: {
                     gatewayOrderId: paymentData.gatewayOrderId, // gatewayorderId is given by the gateway like Razorpay or paytm, 
-                    gatewatResponse: paymentData.gatewatResponse,
+                    gatewayPaymentId: paymentData.gatewayPaymentId
                 },
             });
     
@@ -132,10 +132,14 @@ class PaymentService {
         
         try {
             const payment = await Payment.findById(paymentId);
+
+            if(!payment) {
+                throw new Error(`Payment ${paymentId} not found`);
+            }
             
-            payment.failure = reason;
-            payment.code = code;
-            payment.failedAt = new Date();
+            payment.failure.failure = reason;
+            payment.failure.code = code;
+            payment.failure.failedAt = new Date();
     
             await payment.save();
     

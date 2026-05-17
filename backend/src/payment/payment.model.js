@@ -114,7 +114,7 @@ const paymentSchema = new mongoose.Schema ({
         }
     },
 
-    gatewatResponse: {
+    gatewayResponse: {
         type: Object,
         default: {}
     }
