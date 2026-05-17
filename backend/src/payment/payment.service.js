@@ -91,7 +91,7 @@ class PaymentService {
             }
     
             payment.paymentStatus = status;
-            payment.gatewatResponse = gatewatResponse;
+            payment.gatewatResponse = gatewayResponse;
     
             await payment.save();
     
@@ -165,3 +165,5 @@ class PaymentService {
         }
     }
 }
+
+export {PaymentService}
