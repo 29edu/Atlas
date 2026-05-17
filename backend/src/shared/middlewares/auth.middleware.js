@@ -26,6 +26,7 @@ const authMiddleware = (req, res, next) => {
         req.user =  {
             id: decoded.id,
             email: decoded.email,
+            role: decoded.role
         }
 
         // move to controller

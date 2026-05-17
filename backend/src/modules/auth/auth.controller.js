@@ -6,14 +6,14 @@ const JWT_SECRET = process.env.JWT_SECRET || "mysecetkey";
 
 // Function to generate JWT token
 // Generate fution
-const generateToken = (userId, email) => {
-  return jwt.sign({ id: userId, email: email }, JWT_SECRET, {  // Return json token string
+const generateToken = (userId, email, role) => {
+  return jwt.sign({ id: userId, email: email, role }, JWT_SECRET, {  // Return json token string
     expiresIn: "1h",
   });
 } 
 
 const signUp = async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password} = req.body;
 
   try {
     if (!firstName || !lastName || !email || !password) {
@@ -44,7 +44,7 @@ const signUp = async (req, res) => {
       password: hashedPassword,
     });
 
-    const token = generateToken(newUser._id, email);
+    const token = generateToken(newUser._id, email, newUser.role);
 
     res.status(201).json({ // 201 code because it is created. 200 means OK
       success: true,
@@ -54,7 +54,7 @@ const signUp = async (req, res) => {
           id: newUser._id,
           firstName: newUser.firstName,
           lastName: newUser.lastName,
-          email: newUser.email
+          email: newUser.email,
         },
         token: token, // sending token to frontend
       }
@@ -98,7 +98,7 @@ const login = async (req, res) => {
     }
 
     // Token Generation
-    const token = generateToken(user._id, email);
+    const token = generateToken(user._id, email, user.role);
 
     // send token
     res.status(200).json({
