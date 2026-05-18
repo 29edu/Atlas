@@ -1,0 +1,200 @@
+# ============================================================
+#  Atlas — Microservices Monorepo .gitignore
+# ============================================================
+
+# ----------------------------
+# Node.js — all services
+# ----------------------------
+**/node_modules/
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+**/.pnpm-store/
+**/.yarn/
+**/.pnp.*
+**/.yarn-integrity
+
+# Lock files (keep one per service, ignore the rest)
+# Uncomment below only if you want to ignore ALL lock files
+**/package-lock.json
+# **/yarn.lock
+# **/pnpm-lock.yaml
+
+# ----------------------------
+# Build & Compile Outputs
+# ----------------------------
+**/dist/
+**/build/
+**/out/
+**/.next/
+**/.nuxt/
+**/.svelte-kit/
+**/*.tsbuildinfo
+**/storybook-static/
+
+# ----------------------------
+# Environment & Secrets
+# ----------------------------
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.template
+
+# ----------------------------
+# Logs
+# ----------------------------
+**/logs/
+**/*.log
+**/log/
+
+# ----------------------------
+# Testing & Coverage
+# ----------------------------
+**/coverage/
+**/.nyc_output/
+**/*.coverage
+**/test-results/
+**/playwright-report/
+**/e2e-results/
+
+# Docker
+
+**/.dockerignore
+**/docker-compose.override.yml
+
+# Database / Prisma
+
+**/prisma/migrations/*.dev.db
+**/*.sqlite
+**/*.sqlite3
+**/*.db
+
+# ----------------------------
+# OS Generated Files
+# ----------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+**/.DS_Store
+Thumbs.db
+[Tt]humbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+*.stackdump
+ehthumbs.db
+ehthumbs_vista.db
+
+# ----------------------------
+# IDE & Editor Files
+
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ----------------------------
+# Cache & Temp Files
+# ----------------------------
+**/.cache/
+**/.temp/
+**/.tmp/
+**/*.tmp
+**/*.temp
+**/.eslintcache
+**/.parcel-cache/
+**/.turbo/
+**/.vercel/
+**/.netlify/
+
+# ----------------------------
+# Microservices — Service-specific
+# ----------------------------
+
+# API Gateway
+services/api-gateway/node_modules/
+services/api-gateway/dist/
+services/api-gateway/.env
+
+# Auth Service
+services/auth-services/node_modules/
+services/auth-services/dist/
+services/auth-services/.env
+
+# Cart Service
+services/cart-service/node_modules/
+services/cart-service/dist/
+services/cart-service/.env
+
+# Notification Service
+services/notification-service/node_modules/
+services/notification-service/dist/
+services/notification-service/.env
+
+# Order Service
+services/order-service/node_modules/
+services/order-service/dist/
+services/order-service/.env
+
+# Payment Service
+services/payment-service/node_modules/
+services/payment-service/dist/
+services/payment-service/.env
+
+# Product Service
+services/product-service/node_modules/
+services/product-service/dist/
+services/product-service/.env
+
+# Worker Service
+services/worker-service/node_modules/
+services/worker-service/dist/
+services/worker-service/.env
+
+# ----------------------------
+# Shared Libraries
+# ----------------------------
+shared/node_modules/
+shared/dist/
+
+# ----------------------------
+# Legacy Monolith (backend/)
+# ----------------------------
+backend/node_modules/
+backend/dist/
+backend/build/
+backend/.env
+
+# ----------------------------
+# Frontend
+# ----------------------------
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# ----------------------------
+# Infrastructure
+# ----------------------------
+infrastructure/**/*.env
+infrastructure/ssl/
+infrastructure/certs/
+infrastructure/**/*.pem
+infrastructure/**/*.key
+infrastructure/**/*.crt
