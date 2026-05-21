@@ -14,8 +14,8 @@ services:
 
   auth-service:
     build:
-      context: ../services/auth-services
-      dockerfile: Dockerfile
+      context: ../
+      dockerfile: services/auth-services/Dockerfile
     container_name: atlas-auth
     restart: unless-stopped
     ports:
