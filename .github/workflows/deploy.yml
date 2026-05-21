@@ -18,4 +18,6 @@ jobs:
           script: |
             cd ~/Atlas
             git pull origin main
-            docker-compose -f infrastructure/docker-compose.yml up -d --build
+            docker-compose -f infrastructure/docker-compose.yml down
+            docker-compose -f infrastructure/docker-compose.yml build --no-cache
+            docker-compose -f infrastructure/docker-compose.yml up -d
