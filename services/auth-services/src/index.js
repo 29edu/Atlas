@@ -12,12 +12,16 @@ app.use(express.json());
 
 app.use("/auth", authRoutes);
 
-app.get("/health", (req, res) => res.json({ status: "ok", service: "auth-service" }));
+app.get("/health", (req, res) =>
+  res.json({ status: "ok", service: "auth-service" }),
+);
 
-app.get("/version", (req, res) => res.json({ 
-  version: "1.0.0", 
-  message: "Atlas Auth Service" 
-}));
+app.get("/version", (req, res) =>
+  res.json({
+    version: "1.0.0",
+    message: "Atlas Auth Service - Version 1",
+  }),
+);
 
 await connectDB();
 
