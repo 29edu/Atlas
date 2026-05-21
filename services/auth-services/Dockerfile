@@ -16,6 +16,8 @@ COPY services/auth-services/ ./services/auth-services/
 
 WORKDIR /app/services/auth-services
 
+ENV NODE_PATH=/app/services/auth-services/node_modules
+
 EXPOSE 3001
 
 CMD ["node", "src/index.js"]
