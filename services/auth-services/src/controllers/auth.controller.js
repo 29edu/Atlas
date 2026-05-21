@@ -2,7 +2,7 @@ import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-const JWT_SECRET = process.env.JWT_SECRET || "mysecetkey";
+const JWT_SECRET = process.env.JWT_SECRET || "mysecretkey";
 
 // Function to generate JWT token
 // Generate fution
