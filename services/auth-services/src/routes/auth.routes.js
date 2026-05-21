@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import { login, signUp } from "./auth.controller.js";
+import { login, signUp } from "../controllers/auth.controller.js";
 
 const timeLog = (req, res, next) => {
   console.log("Time: ", new Date().toLocaleString());
