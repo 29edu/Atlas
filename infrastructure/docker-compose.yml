@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: atlas-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - atlas-network
+
+  auth-service:
+    build:
+      context: ../services/auth-services
+      dockerfile: Dockerfile
+    container_name: atlas-auth
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    env_file:
+      - ../services/auth-services/.env
+    depends_on:
+      - mongodb
+    networks:
+      - atlas-network
+
+volumes:
+  mongo-data:
+
+networks:
+  atlas-network:
+    driver: bridge
