@@ -23,7 +23,7 @@
 # CMD ["node", "src/index.js"]
 
 
-FROM node:22-alpin
+FROM node:22-alpine
 
 WORKDIR /app
 
