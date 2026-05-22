@@ -29,6 +29,12 @@ app.get("/version2", (req, res) =>
     message: "Atlas Auth Service - Version 1",
   }),
 );
+app.get("/version3", (req, res) =>
+  res.json({
+    version: "3.0.0",
+    message: "Atlas Auth Service - Version 1",
+  }),
+);
 app.get("/hello", (req, res) =>
   res.json({
     version: "2.0.0",
