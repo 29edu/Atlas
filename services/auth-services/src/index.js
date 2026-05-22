@@ -23,6 +23,13 @@ app.get("/version", (req, res) =>
   }),
 );
 
+app.get("/version2", (req, res) =>
+  res.json({
+    version: "1.0.0",
+    message: "Atlas Auth Service - Version 1",
+  }),
+);
+
 await connectDB();
 
 app.listen(PORT, () => console.log(`Auth service running on port ${PORT}`));
