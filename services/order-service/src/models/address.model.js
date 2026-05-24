@@ -1,6 +1,5 @@
 
 import mongoose from "mongoose";
-import { User } from "../auth/auth.model";
 
 const addressSchema = new mongoose.Schema({
 
