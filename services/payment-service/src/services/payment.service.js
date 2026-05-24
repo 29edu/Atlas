@@ -1,6 +1,6 @@
 
 import Razorpay from "razorpay"
-import { Payment } from "./payment.model.js";
+import { Payment } from "./models/payment.model.js";
 
 import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils"; // inbuilt function in razor pay , directly access it
 
@@ -81,7 +81,7 @@ class PaymentService {
     }
 
     // Update payment status in DB (PENDING -> SUCCESS OR FAILED)
-    async updatePaymentStatus(paymentId, status, gatewatResponse) {
+    async updatePaymentStatus(paymentId, status, gatewayResponse) {
 
         try {
             const payment = await Payment.findById(paymentId);
@@ -91,7 +91,7 @@ class PaymentService {
             }
     
             payment.paymentStatus = status;
-            payment.gatewatResponse = gatewayResponse;
+            payment.gatewayResponse = gatewayResponse;
     
             await payment.save();
     
@@ -137,7 +137,7 @@ class PaymentService {
                 throw new Error(`Payment ${paymentId} not found`);
             }
             
-            payment.failure.failure = reason;
+            payment.failure.reason = reason;
             payment.failure.code = code;
             payment.failure.failedAt = new Date();
     
