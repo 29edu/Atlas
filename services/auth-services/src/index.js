@@ -16,32 +16,6 @@ app.get("/health", (req, res) =>
   res.json({ status: "ok", service: "auth-service" }),
 );
 
-app.get("/version", (req, res) =>
-  res.json({
-    version: "1.0.0",
-    message: "Atlas Auth Service - Version 1",
-  }),
-);
-
-app.get("/version2", (req, res) =>
-  res.json({
-    version: "2.0.0",
-    message: "Atlas Auth Service - Version 1",
-  }),
-);
-app.get("/version3", (req, res) =>
-  res.json({
-    version: "3.0.0",
-    message: "Atlas Auth Service - Version 1",
-  }),
-);
-app.get("/hello", (req, res) =>
-  res.json({
-    version: "2.0.0",
-    message: "Thank you",
-  }),
-);
-
 await connectDB();
 
 app.listen(PORT, () => console.log(`Auth service running on port ${PORT}`));

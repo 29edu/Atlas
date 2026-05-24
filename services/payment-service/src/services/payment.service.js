@@ -1,18 +1,25 @@
 
 import Razorpay from "razorpay"
-import { Payment } from "./models/payment.model.js";
+import { Payment } from "../models/payment.model.js";
 
-import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils"; // inbuilt function in razor pay , directly access it
+import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils.js"; // inbuilt function in razor pay , directly access it
 
 class PaymentService {
 
     // Create a razorpay order (called when the user hits checkout)
 
     constructor() {
-        this.razorpay = new Razorpay({
-            key_id: process.env.RAZORPAY_KEY_ID,
-            key_secret: process.env.RAZORPAY_KEY_SECRET
-        })
+        this.razorpay = null;
+    }
+
+    getRazorpay() {
+        if (!this.razorpay) {
+            this.razorpay = new Razorpay({
+                key_id: process.env.RAZORPAY_KEY_ID,
+                key_secret: process.env.RAZORPAY_KEY_SECRET
+            });
+        }
+        return this.razorpay;
     }
 
     async createPaymentOrder(orderId, amount, currency) {
@@ -22,7 +29,7 @@ class PaymentService {
             const defaultCurrency = "INR";
             const receipt = `recipt_${orderId}`;
 
-            const order = await this.razorpay.orders.create({
+            const order = await this.getRazorpay().orders.create({
                 amount: amountInPaisa,
                 currency:defaultCurrency,
                 receipt: receipt
@@ -53,6 +60,8 @@ class PaymentService {
             return isValid; // return true or false
         } catch (error) {
             console.log(`Failed to verify the payment`)
+
+            throw new Error("Failed to verify the payment")
         }
     }
 
@@ -77,6 +86,8 @@ class PaymentService {
             return payment;
         } catch (error) {
             console.log(`Failed to save the payment with OrderId ${orderId}`);
+
+            throw new Error(`Failed to save the payment with OrderId ${orderId}`)
         }
     }
 
@@ -98,6 +109,8 @@ class PaymentService {
             return payment;
         } catch (error) {
             console.log(`Failed to update the Payment Status ${paymentId}`)
+
+            throw new Error(`Failed to update the Payment Status ${paymentId}`)
         }
     }
 
@@ -112,7 +125,7 @@ class PaymentService {
             }
     
             // To get the refundId i need to get it from the razor pay using API
-            const razorRefund = await this.razorpay.payments.refund(payment.transaction.gatewayPaymentId, {amount: refundAmount * 100})
+            const razorRefund = await this.getRazorpay().payments.refund(payment.transaction.gatewayPaymentId, {amount: refundAmount * 100})
     
             payment.refund.refundId = razorRefund.id; // given by razor pay
             payment.refund.refundAmount = refundAmount;
@@ -124,6 +137,8 @@ class PaymentService {
             return payment;
         } catch (error) {
             console.log(`Failed to Refund the Amount with Payment Id ${paymentId}`)
+
+            throw new Error(`Failed to Refund the Amount with Payment Id ${paymentId}`)
         }
     }
 
@@ -146,6 +161,8 @@ class PaymentService {
             return payment;
         } catch (error) {
             console.log(`Failed to handle Failure with payment Id ${paymentId}`)
+
+            throw new Error(`Failed to handle Failure with payment Id ${paymentId}`)
         }
     }
 
@@ -162,6 +179,8 @@ class PaymentService {
             return payment;
         } catch (error) {
             console.log(`Failed to getPayment Order By Id ${orderId}`)
+
+            throw new Error(`Failed to getPayment Order By Id ${orderId}`)
         }
     }
 }

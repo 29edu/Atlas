@@ -1,5 +1,5 @@
 
-import { PaymentService} from "./payment.service.js";
+import { PaymentService} from "../services/payment.service.js";
 
 const paymentService = new PaymentService();
 
@@ -8,7 +8,7 @@ const initiatePayment = async (req, res) => {
     try {
         const {orderId, amount, currency} = req.body;
     
-        if(!orderId || amount < 0 || !currency) {
+        if(!orderId || amount <= 0 || !currency) {
             return res.status(400).json({
                 success: false,
                 message: "Invalid data"
