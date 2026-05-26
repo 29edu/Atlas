@@ -1,4 +1,8 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname, resolve } from "path";
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: resolve(__dirname, "../../../.env") });
 import { RedisQueue } from "./core/RedisQueue.js";
 import { RedisWorker } from "./workers/RedisWorker.js";
 import HealthMonitor from "./monitors/HealthMonitor.js";
