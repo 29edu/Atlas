@@ -4,6 +4,7 @@ import { dirname, resolve } from "path";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: resolve(__dirname, "../../../.env") });
 
+import mongoose from "mongoose";
 import express from "express";
 import cors from "cors";
 import connectDB from "../../../shared/config/db.js";
@@ -21,6 +22,6 @@ app.get("/health", (req, res) =>
   res.json({ status: "ok", service: "auth-service" }),
 );
 
-await connectDB();
+await connectDB(mongoose);
 
 app.listen(PORT, () => console.log(`Auth service running on port ${PORT}`));

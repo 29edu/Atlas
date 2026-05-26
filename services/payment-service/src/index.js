@@ -7,6 +7,7 @@ import express from "express";
 import cors from "cors";
 import connectDB from "../../../shared/config/db.js";
 import paymentRoutes from "./routes/payment.routes.js";
+import mongoose from "mongoose";
 
 const app = express();
 const PORT = process.env.PORT || 3005;
@@ -18,6 +19,6 @@ app.use("/payment", paymentRoutes);
 
 app.get("/health", (req, res) => res.json({ status: "ok", service: "payment-service" }));
 
-await connectDB();
+await connectDB(mongoose);
 
 app.listen(PORT, () => console.log(`Payment service running on port ${PORT}`));

@@ -1,11 +1,13 @@
-import mongoose from "mongoose"
-
-const connectDB = async () =>{
+const connectDB = async (mongoose) =>{
     try {
-        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/atlas');
-        console.log("Mongodb is connected to local Server");
+        const uri = process.env.MONGO_URI || 'mongodb://localhost:27017/atlas';
+        console.log("Connecting to:", uri.includes("mongodb+srv") ? "Atlas (cloud)" : "localhost");
+        await mongoose.connect(uri);
+
+        console.log("Mongodb is connected");
     } catch(error) {
-        console.error(`Some error is found in the mongodb ${error}`)
+        console.error(`MongoDB connection failed: ${error.message}`);
+        process.exit(1);
     }
 }
 
