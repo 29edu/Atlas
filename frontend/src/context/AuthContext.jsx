@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
@@ -28,7 +28,7 @@ function AuthProvider({children}) {
     //login function
     const login = async (email, password) => {
         try {
-            const response = await fetch("http://localhost:5082/login", {
+            const response = await fetch("http://localhost:3001/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -79,3 +79,9 @@ function AuthProvider({children}) {
         <AuthContext.Provider value={{isAuthenticated, user, token, loading, login, logout}}>{children}</AuthContext.Provider>
     )
 }
+
+export function useAuth() {
+    return useContext(AuthContext);
+}
+
+export { AuthContext, AuthProvider };

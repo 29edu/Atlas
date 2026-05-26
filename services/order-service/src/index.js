@@ -7,6 +7,7 @@ import express from "express";
 import cors from "cors";
 import connectDB from "../../../shared/config/db.js";
 import orderRoutes from "./routes/order.routes.js";
+import mongoose from "mongoose";
 
 const app = express();
 const PORT = process.env.PORT || 3004;
@@ -18,6 +19,6 @@ app.use("/", orderRoutes);
 
 app.get("/health", (req, res) => res.json({ status: "ok", service: "order-service" }));
 
-await connectDB();
+await connectDB(mongoose);
 
 app.listen(PORT, () => console.log(`Order service running on port ${PORT}`));

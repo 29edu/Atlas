@@ -1,37 +1,39 @@
 
-import Address from "../address/address.model.js";
-import { Order } from "./order.model.js";
+// import Address from "../address/address.model.js";
+import { Order } from "../models/order.model.js";
 
 const createOrder =  async (req, res) => {
 
     try {
-        
-        const userId = req.user.id;
-        
-        const { products, total, status, paymentMethod, addressId} = req.body;
-        const shippingAddress = await Address.findOne({
-            _id: addressId,
-            userId
-        })
 
-        if(!shippingAddress) {
-            return res.status(404).json({
-                success: false,
-                message: "Address Not found"
-            })
-        }
+        const userId = req.user.id;
+
+        const { products, total, status, paymentMethod, addressId} = req.body;
+        // const shippingAddress = await Address.findOne({
+        //     _id: addressId,
+        //     userId
+        // })
+
+        // if(!shippingAddress) {
+        //     return res.status(404).json({
+        //         success: false,
+        //         message: "Address Not found" 
+        //     })
+        // }
 
         const order = await Order.create({
             userId,
-            products, 
-            total, 
+            products,
+            total,
             status,
-            paymentMethod : {
+            payment : {
                 method: paymentMethod,
                 status: "pending"
             },
-            shippingAddress: shippingAddress._id
-            
+            // shippingAddress: shippingAddress._id
+            ...(addressId && { shippingAddress: addressId }),
+
+
         });
 
         res.status(201).json({

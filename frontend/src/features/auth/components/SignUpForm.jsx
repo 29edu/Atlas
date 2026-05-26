@@ -27,7 +27,7 @@ export default function SignUpForm() {
         return;
       }
 
-      const response = await axios.post("http://localhost:5082/signup", {
+      const response = await axios.post("http://localhost:3001/auth/signup", {
         firstName,
         lastName,
         email,
@@ -35,7 +35,9 @@ export default function SignUpForm() {
       });
 
       if (response.data.success) {
-        navigate('/dashboard')
+        localStorage.setItem("token", response.data.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.data.user));
+        navigate('/products')
         toast.success("Sign Up successful");
       } else {
         toast.error("Sign up failed");

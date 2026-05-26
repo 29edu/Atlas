@@ -110,7 +110,7 @@ const refundPayment = async (req, res) => {
 const getPaymentStatus = async (req, res) => {
     
     try {
-        const {orderId} = req.params;
+        const { id: orderId } = req.params;
     
         const paymentStatus = await paymentService.getPaymentOrderById(orderId);
     

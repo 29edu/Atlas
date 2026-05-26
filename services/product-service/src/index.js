@@ -5,6 +5,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: resolve(__dirname, "../../../.env") });
 import express from "express";
 import cors from "cors";
+import mongoose from "mongoose";
 import connectDB from "../../../shared/config/db.js";
 import productRoutes from "./routes/product.routes.js";
 
@@ -18,6 +19,6 @@ app.use("/", productRoutes);
 
 app.get("/health", (req, res) => res.json({ status: "ok", service: "product-service" }));
 
-await connectDB();
+await connectDB(mongoose);
 
 app.listen(PORT, () => console.log(`Product service running on port ${PORT}`));

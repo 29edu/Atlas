@@ -1,46 +1,26 @@
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState([]);
 
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
+  const handleEmailChange = (e) => setEmail(e.target.value);
+  const handlePasswordChange = (e) => setPassword(e.target.value);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      const data = { email, password };
-      const response = await fetch("http://localhost:5082/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      const responseFromServer = await response.json();
-      const success = responseFromServer.success;
-
-      if (success) {
-        toast.success("Login Successful");
-        navigate('/dashboard');
-      } else {
-        toast.error("Failed to login");
-      }
-    } catch (error) {
-      console.log("Found some error in login", error.message);
+    const result = await login(email, password);
+    if (result.success) {
+      toast.success("Login Successful");
+      navigate("/products");
+    } else {
+      toast.error(result.message || "Failed to login");
     }
   };
 
