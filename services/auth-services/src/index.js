@@ -22,6 +22,14 @@ app.get("/health", (req, res) =>
   res.json({ status: "ok", service: "auth-service" }),
 );
 
+app.get('/hello', (req, res) => {
+  res.json({
+    status: "Ok",
+    service: "Auth service",
+    message: "Hello word"
+  })
+})
+
 await connectDB(mongoose);
 
 app.listen(PORT, () => console.log(`Auth service running on port ${PORT}`));
